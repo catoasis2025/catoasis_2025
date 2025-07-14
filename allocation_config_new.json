@@ -1,0 +1,520 @@
+{
+    "transaction_table": "s3://fsd-os-dev-good-data/good/test/{}_042025_20250606000000/",
+    "rules_table": "s3://fsd-os-dev-master-tables/test_rules/optimized_rules/2025-04-01/CTL_FNCL_ORG_CD={}/POP_FLD_NM={}/",
+    "primary_column": [
+        "FAC_CD",
+        "SEQ_NO",
+        "JE_GRP_NO",
+        "RCVBL_INVC_CTL_NO"
+    ],
+    "ap_det_additional_columns": [
+        "SLS_MDL_NO",
+        "TRAF_REF_NO",
+        "EDS_PROD_FAM_CD"
+    ],
+    "exp_det_additional_columns": [
+        "SLS_MDL_NO",
+        "TRAF_REF_NO",
+        "EDS_PROD_FAM_CD"
+    ],
+    "fogap_det_additional_columns": [
+        "TRAF_REF_NO",
+        "EDS_PROD_FAM_CD"
+    ],
+    "frt_pay_det_additional_columns": [
+        "SLS_MDL_NO",
+        "EDS_PROD_FAM_CD"
+    ],
+    "inv_det_additional_columns": [
+        "SLS_MDL_NO",
+        "TRAF_REF_NO",
+        "EDS_PROD_FAM_CD"
+    ],
+    "lbr_det_additional_columns": [
+        "SLS_MDL_NO",
+        "TRAF_REF_NO",
+        "EDS_PROD_FAM_CD"
+    ],
+    "war_det_additional_columns": [
+        "TRAF_REF_NO"
+    ],
+    "scos_det_additional_columns": [
+        "TRAF_REF_NO"
+    ],
+    "final_columns": [
+        "transaction_id",
+        "FAC_CD",
+        "DTA_TYP_CD",
+        "ACCTG_YR",
+        "ACCTG_PRD_NO",
+        "JE_GRP_NO",
+        "SEQ_NO",
+        "FNCL_ORG_CD",
+        "PCTR_LWR_TIER_2",
+        "NEW_FNCL_ACCT_NO",
+        "RCVBL_INVC_CTL_NO",
+        "DEPT_NO",
+        "SLS_MDL_NO",
+        "TRAF_REF_NO",
+        "EDS_PROD_FAM_CD",
+        "OWN_FNCL_ORG_CD",
+        "LAST_UPDT_ACTV_ID",
+        "UPDT_USER_LOGON_ID",
+        "LAST_UPDT_TS",
+        "SF_CDC_TS",
+        "FNCT",
+        "PCTR_FAC_CD",
+        "PRD_VAR_CD",
+        "ACCT_LVL",
+        "SAP_NO",
+        "POP_FLD_VAL",
+        "ASGN_DIST_PCT",
+        "rule_id",
+        "FLD_NM",
+        "FLD_MTCH_VAL",
+        "POP_FLD_PRTY",
+        "FILE_ID",
+        "SRC_JE_DR_AMT",
+        "JE_DR_AMT",
+        "SRC_AMT",
+        "TO_FAC_CD"
+    ],
+    "columns_to_round": [
+        "JE_DR_AMT",
+        "SRC_JE_DR_AMT",
+        "SRC_AMT"
+    ],
+    "rule_types": {
+        "accnt_lvl": {
+            "accnt_lvl_path": "s3://fsd-os-dev-master-tables/test_rules/accnt_lvl_cq/",
+            "accnt_lvl_query": "select transaction_table.FAC_CD,transaction_table.DTA_TYP_CD,transaction_table.ACCTG_YR,transaction_table.ACCTG_PRD_NO,transaction_table.JE_GRP_NO,transaction_table.SEQ_NO,transaction_table.PCTR_FAC_CD,transaction_table.PCTR_LWR_TIER_2,transaction_table.FNCL_ORG_CD,transaction_table.NEW_FNCL_ACCT_NO,transaction_table.PRD_VAR_CD,transaction_table.JE_DR_AMT,transaction_table.RCVBL_INVC_CTL_NO,transaction_table.SRC_AMT,transaction_table.DEPT_NO,transaction_table.SLS_MDL_NO,transaction_table.TRAF_REF_NO,transaction_table.EDS_PROD_FAM_CD,transaction_table.OWN_FNCL_ORG_CD,transaction_table.LAST_UPDT_ACTV_ID,transaction_table.UPDT_USER_LOGON_ID,transaction_table.LAST_UPDT_TS,transaction_table.SF_CDC_TS,acct_lvl.ACCT_LVL,acct_lvl.SAP_NO from transaction_table left join acct_lvl on transaction_table.FAC_CD=acct_lvl.CTL_FNCL_ORG_CD and transaction_table.NEW_FNCL_ACCT_NO=acct_lvl.NEW_FNCL_ACCT_NO"
+        },
+        "FNCT": {
+            "scos_det_field_conditions": {
+                "FAC": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern)",
+                "AC": "(!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val) OR (b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern)",
+                "ORG": "(!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern)",
+                "ORG-AC": "((!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern)) OR ((!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern))"
+            },
+            "ap_det_field_conditions": {
+                "FAC": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern)",
+                "AC": "(!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val) OR (b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern)",
+                "ORG": "(!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern)",
+                "ORG-AC": "((!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern)) OR ((!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern))"
+            },
+            "exp_det_field_conditions": {
+                "FAC": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern)",
+                "AC": "(!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val) OR (b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern)",
+                "ORG": "(!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern)",
+                "ORG-AC": "((!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern)) OR ((!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern))"
+            },
+            "fogap_det_field_conditions": {
+                "FAC": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern)",
+                "AC": "(!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val) OR (b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern)",
+                "ORG": "(!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern)",
+                "ORG-AC": "((!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern)) OR ((!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern))"
+            },
+            "frt_pay_det_field_conditions": {
+                "FAC": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern)",
+                "AC": "(!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val) OR (b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern)",
+                "ORG": "(!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern)",
+                "ORG-AC": "((!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern)) OR ((!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern))"
+            },
+            "inv_det_field_conditions": {
+                "FAC": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern)",
+                "AC": "(!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val) OR (b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern)",
+                "ORG": "(!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern)",
+                "ORG-AC": "((!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern)) OR ((!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern))"
+            },
+            "lbr_det_field_conditions": {
+                "FAC": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern)",
+                "AC": "(!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val) OR (b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern)",
+                "ORG": "(!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern)",
+                "ORG-AC": "((!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern)) OR ((!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern))"
+            },
+            "war_det_field_conditions": {
+                "FAC": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern)",
+                "AC": "(!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val) OR (b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern)",
+                "ORG": "(!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern)",
+                "ORG-AC": "((!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern)) OR ((!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern))"
+            },
+            "allocation_lvl": "1",
+            "allocation_query_fnct": "WITH joined AS (SELECT a.transaction_id,a.FAC_CD,a.DTA_TYP_CD,a.ACCTG_YR,a.ACCTG_PRD_NO,a.JE_GRP_NO,a.SEQ_NO,a.PCTR_FAC_CD,a.PCTR_LWR_TIER_2,a.JE_DR_AMT,a.SRC_AMT,a.FNCL_ORG_CD,a.NEW_FNCL_ACCT_NO,a.RCVBL_INVC_CTL_NO,a.DEPT_NO,a.OWN_FNCL_ORG_CD,a.LAST_UPDT_ACTV_ID,a.UPDT_USER_LOGON_ID,a.LAST_UPDT_TS,a.SF_CDC_TS,a.PRD_VAR_CD,a.SLS_MDL_NO,a.TRAF_REF_NO,a.EDS_PROD_FAM_CD,a.ACCT_LVL,a.SAP_NO,a.is_allocated, b.POP_FLD_VAL,  b.ASGN_DIST_PCT, b.ASGN_RULE_ID AS rule_id, b.FLD_NM, b.FLD_MTCH_VAL, b.POP_FLD_PRTY, b.FILE_ID FROM unallocated a INNER JOIN rule_fields b ON a.FAC_CD = b.CTL_FNCL_ORG_CD and {} ) SELECT transaction_id, FAC_CD, DTA_TYP_CD, ACCTG_YR, ACCTG_PRD_NO, JE_GRP_NO, SEQ_NO, PCTR_FAC_CD, PCTR_LWR_TIER_2, FNCL_ORG_CD, NEW_FNCL_ACCT_NO, RCVBL_INVC_CTL_NO, DEPT_NO, OWN_FNCL_ORG_CD, LAST_UPDT_ACTV_ID, UPDT_USER_LOGON_ID, LAST_UPDT_TS, SF_CDC_TS,PRD_VAR_CD,SLS_MDL_NO,TRAF_REF_NO,EDS_PROD_FAM_CD, ACCT_LVL, SAP_NO, is_allocated, POP_FLD_VAL, ASGN_DIST_PCT, rule_id, FLD_NM, FLD_MTCH_VAL, POP_FLD_PRTY,FILE_ID,JE_DR_AMT AS excel, (ASGN_DIST_PCT * JE_DR_AMT) / 100 AS JE_DR_AMT, (ASGN_DIST_PCT * SRC_AMT) / 100 AS SRC_AMT, POP_FLD_VAL AS FNCT FROM joined"
+        },
+        "PV": {
+            "scos_det_field_conditions": {
+                "FAC": "(b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val)",
+                "AC": "(b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val)",
+                "ORG": "(b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val)",
+                "ACLVLS": "a.ACCT_LVL LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "BU-ACLVLS": "concat(a.FAC_CD, a.ACCT_LVL) LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "ACCT": "(b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val)",
+                "BU": "(b.has_wildcard AND a.PCTR_FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_FAC_CD = b.fld_mtch_val)",
+				"ORG-AC": "(!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern)",
+				"BU-AC": "(!b.has_wildcard AND a.PCTR_FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.PCTR_FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.PCTR_FAC_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.PCTR_FAC_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern)",
+				"SUB-SUB": "(length(a.NEW_FNCL_ACCT_NO) = 10 AND right(a.NEW_FNCL_ACCT_NO, 2) = b.fld_mtch_val)",
+				"SECTION": "RIGHT(a.FNCL_ORG_CD, 2) = b.fld_mtch_val"
+            },
+            "ap_det_field_conditions": {
+                "FAC": "(b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val)",
+                "AC": "(b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val)",
+                "ORG": "(b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val)",
+                "ORG-AC": "((b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val))"
+            },
+            "exp_det_field_conditions": {
+                "FAC": "(b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val)",
+                "AC": "(b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val)",
+                "ORG": "(b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val)",
+                "ORG-AC": "((b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val))"
+            },
+            "fogap_det_field_conditions": {
+                "FAC": "(b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val)",
+                "AC": "(b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val)",
+                "ORG": "(b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val)",
+                "ORG-AC": "((b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val))"
+            },
+            "frt_pay_det_field_conditions": {
+                "FAC": "(b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val)",
+                "AC": "(b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val)",
+                "ORG": "(b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val)",
+                "ORG-AC": "((b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val))"
+            },
+            "inv_det_field_conditions": {
+                "FAC": "(b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val)",
+                "AC": "(b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val)",
+                "ORG": "(b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val)",
+                "ORG-AC": "((b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val))"
+            },
+            "lbr_det_field_conditions": {
+                "FAC": "(b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val)",
+                "AC": "(b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val)",
+                "ORG": "(b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val)",
+                "ORG-AC": "((b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val))"
+            },
+            "war_det_field_conditions": {
+                "FAC": "(b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val)",
+                "AC": "(b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val)",
+                "ORG": "(b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val)",
+                "ORG-AC": "((b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val))"
+            },
+            "allocation_lvl": "2",
+            "pv_burden_pool": "s3://fsd-os-dev-master-tables/test_rules/PV_BRDN_POOL/",
+            "allocation_query_pv": "WITH joined_data AS (SELECT a.transaction_id, a.FAC_CD, a.DTA_TYP_CD, a.ACCTG_YR, a.ACCTG_PRD_NO, a.JE_GRP_NO, a.SEQ_NO, a.PCTR_FAC_CD, a.PCTR_LWR_TIER_2, a.JE_DR_AMT, a.SRC_AMT, a.FNCL_ORG_CD,a.SLS_MDL_NO,a.TRAF_REF_NO,a.EDS_PROD_FAM_CD, a.NEW_FNCL_ACCT_NO, a.RCVBL_INVC_CTL_NO, a.DEPT_NO, a.OWN_FNCL_ORG_CD, a.LAST_UPDT_ACTV_ID, a.UPDT_USER_LOGON_ID, a.LAST_UPDT_TS, a.SF_CDC_TS,a.PRD_VAR_CD,a.ACCT_LVL, a.SAP_NO, a.is_allocated, b.POP_FLD_VAL, b.ASGN_DIST_PCT, b.ASGN_RULE_ID AS rule_id, b.FLD_NM, b.FLD_MTCH_VAL, b.POP_FLD_PRTY, b.FILE_ID, b.eff_dt FROM unallocated a INNER JOIN rule_fields b ON a.FAC_CD = b.CTL_FNCL_ORG_CD and {}), ranked_data AS (SELECT *, RANK() OVER (PARTITION BY transaction_id ORDER BY eff_dt ASC) AS rank FROM joined_data), filtered_data AS (SELECT transaction_id, FAC_CD, DTA_TYP_CD, ACCTG_YR, ACCTG_PRD_NO, JE_GRP_NO, SEQ_NO,PCTR_FAC_CD, PCTR_LWR_TIER_2, FNCL_ORG_CD, NEW_FNCL_ACCT_NO, RCVBL_INVC_CTL_NO, DEPT_NO, OWN_FNCL_ORG_CD,SLS_MDL_NO,TRAF_REF_NO,EDS_PROD_FAM_CD, LAST_UPDT_ACTV_ID, UPDT_USER_LOGON_ID, LAST_UPDT_TS, SF_CDC_TS, ACCT_LVL, SAP_NO, is_allocated, POP_FLD_VAL, ASGN_DIST_PCT, rule_id, FLD_NM, FLD_MTCH_VAL, POP_FLD_PRTY, FILE_ID, JE_DR_AMT AS SRC_JE_DR_AMT, (ASGN_DIST_PCT * JE_DR_AMT) / 100 AS JE_DR_AMT, (ASGN_DIST_PCT * SRC_AMT) / 100 AS SRC_AMT, POP_FLD_VAL AS PRD_VAR_CD FROM ranked_data WHERE rank = 1) SELECT * FROM filtered_data",
+            "burden_pool_query": "SELECT a.*, b.PV_CORP_POOL, b.PV_SUM_POOL FROM final_allocation a LEFT JOIN burden_pool b ON a.FAC_CD = b.CTL_FNCL_ORG_CD AND a.PRD_VAR_CD = b.PV_SUB_POOL"
+        },
+        "BU": {
+            "scos_det_field_conditions": {
+                "FAC": "(b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val)",
+                "AC": "(b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val)",
+                "ORG": "(b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val)",
+                "ACLVLS": "a.ACCT_LVL LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "BU-ACLVLS": "concat(a.FAC_CD, a.ACCT_LVL) LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "ACCT": "(b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val)",
+                "BU": "(b.has_wildcard AND a.PCTR_FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_FAC_CD = b.fld_mtch_val)",
+				"ORG-AC": "(!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern)",
+				"BU-AC": "(!b.has_wildcard AND a.PCTR_FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.PCTR_FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.PCTR_FAC_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.PCTR_FAC_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern)",
+				"SUB-SUB": "(length(a.NEW_FNCL_ACCT_NO) = 10 AND right(a.NEW_FNCL_ACCT_NO, 2) = b.fld_mtch_val)"
+            },
+            "ap_det_field_conditions": {
+                "FAC": "(b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val)",
+                "AC": "(b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val)",
+                "ORG": "(b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val)",
+                "ORG-AC": "((b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val))"
+            },
+            "exp_det_field_conditions": {
+                "FAC": "(b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val)",
+                "AC": "(b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val)",
+                "ORG": "(b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val)",
+                "ORG-AC": "((b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val))"
+            },
+            "fogap_det_field_conditions": {
+                "FAC": "(b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val)",
+                "AC": "(b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val)",
+                "ORG": "(b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val)",
+                "ORG-AC": "((b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val))"
+            },
+            "frt_pay_det_field_conditions": {
+                "FAC": "(b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val)",
+                "AC": "(b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val)",
+                "ORG": "(b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val)",
+                "ORG-AC": "((b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val))"
+            },
+            "inv_det_field_conditions": {
+                "FAC": "(b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val)",
+                "AC": "(b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val)",
+                "ORG": "(b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val)",
+                "ORG-AC": "((b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val))"
+            },
+            "lbr_det_field_conditions": {
+                "FAC": "(b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val)",
+                "AC": "(b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val)",
+                "ORG": "(b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val)",
+                "ORG-AC": "((b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val))"
+            },
+            "war_det_field_conditions": {
+                "FAC": "(b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val)",
+                "AC": "(b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val)",
+                "ORG": "(b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val)",
+                "ORG-AC": "((b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val))"
+            },
+            "allocation_lvl": "3",
+            "split_required": {
+                "column_name": "PCTR_FAC_CD"
+            },
+            "allocation_query_bu": "WITH joined_data AS (SELECT a.transaction_id, a.FAC_CD, a.DTA_TYP_CD, a.ACCTG_YR, a.ACCTG_PRD_NO, a.JE_GRP_NO, a.SEQ_NO, a.PCTR_LWR_TIER_2, a.JE_DR_AMT, a.SRC_AMT, a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO, a.RCVBL_INVC_CTL_NO, a.DEPT_NO, a.OWN_FNCL_ORG_CD, a.LAST_UPDT_ACTV_ID, a.UPDT_USER_LOGON_ID, a.LAST_UPDT_TS, a.SF_CDC_TS,a.FNCT,a.PRD_VAR_CD,a.SLS_MDL_NO,a.TRAF_REF_NO,a.EDS_PROD_FAM_CD, a.ACCT_LVL, a.SAP_NO, a.is_allocated, b.POP_FLD_VAL, b.ASGN_DIST_PCT, b.ASGN_RULE_ID AS rule_id, b.FLD_NM, b.FLD_MTCH_VAL, b.POP_FLD_PRTY, b.FILE_ID, b.eff_dt FROM unallocated a INNER JOIN rule_fields b ON a.FAC_CD = b.CTL_FNCL_ORG_CD and {}), ranked_data AS (SELECT *, RANK() OVER (PARTITION BY transaction_id ORDER BY eff_dt ASC) AS rank FROM joined_data), filtered_data AS (SELECT transaction_id, FAC_CD, DTA_TYP_CD, ACCTG_YR, ACCTG_PRD_NO, JE_GRP_NO, SEQ_NO, PCTR_LWR_TIER_2, FNCL_ORG_CD, NEW_FNCL_ACCT_NO, RCVBL_INVC_CTL_NO, DEPT_NO, OWN_FNCL_ORG_CD, LAST_UPDT_ACTV_ID, UPDT_USER_LOGON_ID,SLS_MDL_NO,TRAF_REF_NO,EDS_PROD_FAM_CD, LAST_UPDT_TS, SF_CDC_TS,FNCT, PRD_VAR_CD,ACCT_LVL, SAP_NO, is_allocated, POP_FLD_VAL, ASGN_DIST_PCT, rule_id, FLD_NM, FLD_MTCH_VAL, POP_FLD_PRTY, FILE_ID, JE_DR_AMT AS SRC_JE_DR_AMT, (ASGN_DIST_PCT * JE_DR_AMT) / 100 AS JE_DR_AMT, (ASGN_DIST_PCT * SRC_AMT) / 100 AS SRC_AMT, POP_FLD_VAL AS PCTR_FAC_CD FROM ranked_data WHERE rank = 1) SELECT * FROM filtered_data"
+        },
+        "LT2": {
+            "scos_det_field_conditions": {
+                "ACLVLS": "a.ACCT_LVL LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "ACCT-OWN-FNCL-ORG": "((b.has_wildcard AND concat(a.NEW_FNCL_ACCT_NO, a.OWN_FNCL_ORG_CD) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.NEW_FNCL_ACCT_NO, a.OWN_FNCL_ORG_CD) = b.fld_mtch_val))",
+                "ORG-AC": "((b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val))",
+                "BU-ACCT": "((b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val))",
+                "BU-AC": "((b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val))",
+                "BU-ORG": "((b.has_wildcard AND concat(a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val))",
+                "AC1256": "((b.has_wildcard AND substring(concat_ws('', substring(a.NEW_FNCL_ACCT_NO, 1, 1), substring(a.NEW_FNCL_ACCT_NO, 2, 1), substring(a.NEW_FNCL_ACCT_NO, 5, 1), substring(a.NEW_FNCL_ACCT_NO, 6, 1)), 1, 100) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat_ws('', substring(a.NEW_FNCL_ACCT_NO, 1, 1), substring(a.NEW_FNCL_ACCT_NO, 2, 1), substring(a.NEW_FNCL_ACCT_NO, 5, 1), substring(a.NEW_FNCL_ACCT_NO, 6, 1)) = b.fld_mtch_val))",
+                "ORG": "((b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val))",
+                "AC": "((b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val))",
+                "ACCT": "((b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val))",
+                "FAC": "((b.has_wildcard AND a.PCTR_FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_FAC_CD = b.fld_mtch_val))",
+                "BU": "((b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val))",
+                "ITM-OWN-CD": "((b.has_wildcard AND a.OWN_FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.OWN_FNCL_ORG_CD = b.fld_mtch_val))",
+                "DEPTNO": "((b.has_wildcard AND a.DEPT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.DEPT_NO = b.fld_mtch_val))",
+                "PROD-FAM": "((b.has_wildcard AND a.EDS_PROD_FAM_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.EDS_PROD_FAM_CD = b.fld_mtch_val))",
+                "SALES-MODEL": "((b.has_wildcard AND a.SLS_MDL_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.SLS_MDL_NO = b.fld_mtch_val))"
+            },
+            "ap_det_field_conditions": {
+                "ACLVLS": "a.ACCT_LVL LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "ACCT-OWN-FNCL-ORG": "((b.has_wildcard AND concat(a.NEW_FNCL_ACCT_NO, a.OWN_FNCL_ORG_CD) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.NEW_FNCL_ACCT_NO, a.OWN_FNCL_ORG_CD) = b.fld_mtch_val))",
+                "ORG-AC": "((b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val))",
+                "BU-ACCT": "((b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val))",
+                "BU-AC": "((b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val))",
+                "BU-ORG": "((b.has_wildcard AND concat(a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val))",
+                "AC1256": "((b.has_wildcard AND substring(concat_ws('', substring(a.NEW_FNCL_ACCT_NO, 1, 1), substring(a.NEW_FNCL_ACCT_NO, 2, 1), substring(a.NEW_FNCL_ACCT_NO, 5, 1), substring(a.NEW_FNCL_ACCT_NO, 6, 1)), 1, 100) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat_ws('', substring(a.NEW_FNCL_ACCT_NO, 1, 1), substring(a.NEW_FNCL_ACCT_NO, 2, 1), substring(a.NEW_FNCL_ACCT_NO, 5, 1), substring(a.NEW_FNCL_ACCT_NO, 6, 1)) = b.fld_mtch_val))",
+                "ORG": "((b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val))",
+                "AC": "((b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val))",
+                "ACCT": "((b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val))",
+                "FAC": "((b.has_wildcard AND a.PCTR_FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_FAC_CD = b.fld_mtch_val))",
+                "BU": "((b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val))",
+                "ITM-OWN-CD": "((b.has_wildcard AND a.OWN_FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.OWN_FNCL_ORG_CD = b.fld_mtch_val))",
+                "DEPTNO": "((b.has_wildcard AND a.DEPT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.DEPT_NO = b.fld_mtch_val))"
+            },
+            "exp_det_field_conditions": {
+                "ACLVLS": "a.ACCT_LVL LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "ORG-AC": "(!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern)",
+                "BU-ACCT": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern)",
+                "BU-AC": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern)",
+                "BU-ORG": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern)",
+                "AC1256": "(!b.has_wildcard AND concat_ws('', substring(a.NEW_FNCL_ACCT_NO, 1, 1), substring(a.NEW_FNCL_ACCT_NO, 2, 1), substring(a.NEW_FNCL_ACCT_NO, 5, 1), substring(a.NEW_FNCL_ACCT_NO, 6, 1)) = b.fld_mtch_val) OR (b.has_wildcard AND substring(concat_ws('', substring(a.NEW_FNCL_ACCT_NO, 1, 1), substring(a.NEW_FNCL_ACCT_NO, 2, 1), substring(a.NEW_FNCL_ACCT_NO, 5, 1), substring(a.NEW_FNCL_ACCT_NO, 6, 1)), 1, 100) RLIKE b.regex_pattern)",
+                "ORG": "((b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val))",
+                "AC": "((b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val))",
+                "ACCT": "((b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val))",
+                "FAC": "((b.has_wildcard AND a.PCTR_FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_FAC_CD = b.fld_mtch_val))",
+                "BU": "((b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val))",
+                "DEPTNO": "((b.has_wildcard AND a.DEPT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.DEPT_NO = b.fld_mtch_val))"
+            },
+            "fogap_det_field_conditions": {
+                "ACLVLS": "a.ACCT_LVL LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "ACCT-OWN-FNCL-ORG": "(!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val) OR (b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.NEW_FNCL_ACCT_NO, a.OWN_FNCL_ORG_ORG) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.NEW_FNCL_ACCT_NO, a.OWN_FNCL_ORG_ORG) RLIKE b.regex_pattern)",
+                "ORG-AC": "(!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern)",
+                "BU-ACCT": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern)",
+                "BU-AC": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern)",
+                "BU-ORG": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern)",
+                "AC1256": "(!b.has_wildcard AND concat_ws('', substring(a.NEW_FNCL_ACCT_NO, 1, 1), substring(a.NEW_FNCL_ACCT_NO, 2, 1), substring(a.NEW_FNCL_ACCT_NO, 5, 1), substring(a.NEW_FNCL_ACCT_NO, 6, 1)) = b.fld_mtch_val) OR (b.has_wildcard AND substring(concat_ws('', substring(a.NEW_FNCL_ACCT_NO, 1, 1), substring(a.NEW_FNCL_ACCT_NO, 2, 1), substring(a.NEW_FNCL_ACCT_NO, 5, 1), substring(a.NEW_FNCL_ACCT_NO, 6, 1)), 1, 100) RLIKE b.regex_pattern)",
+                "ORG": "((b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val))",
+                "AC": "((b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val))",
+                "ACCT": "((b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val))",
+                "FAC": "((b.has_wildcard AND a.PCTR_FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_FAC_CD = b.fld_mtch_val))",
+                "BU": "((b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val))",
+                "DEPTNO": "((b.has_wildcard AND a.DEPT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.DEPT_NO = b.fld_mtch_val))",
+                "SALES-MODEL": "((b.has_wildcard AND a.SLS_MDL_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.SLS_MDL_NO = b.fld_mtch_val))"
+            },
+            "frt_pay_det_field_conditions": {
+                "ORG": "((b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val))",
+                "AC": "((b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val))",
+                "ACCT": "((b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val))",
+                "FAC": "((b.has_wildcard AND a.PCTR_FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_FAC_CD = b.fld_mtch_val))",
+                "BU": "((b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val))",
+                "DEPTNO": "((b.has_wildcard AND a.DEPT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.DEPT_NO = b.fld_mtch_val))",
+                "ACLVLS": "a.ACCT_LVL LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "TRAF-REF-NO-1-4": "b.fld_mtch_val LIKE CONCAT(SUBSTRING(a.TRAF_REF_NO, 1, 4), '%')",
+                "ORG-AC": "(!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern)",
+                "BU-ACCT": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern)",
+                "BU-AC": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern)",
+                "BU-ORG": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern)",
+                "AC1256": "(!b.has_wildcard AND concat_ws('', substring(a.NEW_FNCL_ACCT_NO, 1, 1), substring(a.NEW_FNCL_ACCT_NO, 2, 1), substring(a.NEW_FNCL_ACCT_NO, 5, 1), substring(a.NEW_FNCL_ACCT_NO, 6, 1)) = b.fld_mtch_val) OR (b.has_wildcard AND substring(concat_ws('', substring(a.NEW_FNCL_ACCT_NO, 1, 1), substring(a.NEW_FNCL_ACCT_NO, 2, 1), substring(a.NEW_FNCL_ACCT_NO, 5, 1), substring(a.NEW_FNCL_ACCT_NO, 6, 1)), 1, 100) RLIKE b.regex_pattern)"
+            },
+            "inv_det_field_conditions": {
+                "ACLVLS": "a.ACCT_LVL LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "ACCT-OWN-FNCL-ORG": "(!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val) OR (b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.NEW_FNCL_ACCT_NO, a.OWN_FNCL_ORG_CD) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.NEW_FNCL_ACCT_NO, a.OWN_FNCL_ORG_CD) RLIKE b.regex_pattern)",
+                "ORG-AC": "(!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern)",
+                "BU-ACCT": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern)",
+                "BU-AC": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern)",
+                "BU-ORG": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern)",
+                "AC1256": "(!b.has_wildcard AND concat_ws('', substring(a.NEW_FNCL_ACCT_NO, 1, 1), substring(a.NEW_FNCL_ACCT_NO, 2, 1), substring(a.NEW_FNCL_ACCT_NO, 5, 1), substring(a.NEW_FNCL_ACCT_NO, 6, 1)) = b.fld_mtch_val) OR (b.has_wildcard AND substring(concat_ws('', substring(a.NEW_FNCL_ACCT_NO, 1, 1), substring(a.NEW_FNCL_ACCT_NO, 2, 1), substring(a.NEW_FNCL_ACCT_NO, 5, 1), substring(a.NEW_FNCL_ACCT_NO, 6, 1)), 1, 100) RLIKE b.regex_pattern)",
+                "ORG": "((b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val))",
+                "AC": "((b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val))",
+                "ACCT": "((b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val))",
+                "FAC": "((b.has_wildcard AND a.PCTR_FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_FAC_CD = b.fld_mtch_val))",
+                "BU": "((b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val))",
+                "DEPTNO": "((b.has_wildcard AND a.DEPT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.DEPT_NO = b.fld_mtch_val))"
+            },
+            "lbr_det_field_conditions": {
+                "ACLVLS": "a.ACCT_LVL LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "ORG-AC": "(!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern)",
+                "BU-ACCT": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern)",
+                "BU-AC": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern)",
+                "BU-ORG": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern)",
+                "AC1256": "(!b.has_wildcard AND concat_ws('', substring(a.NEW_FNCL_ACCT_NO, 1, 1), substring(a.NEW_FNCL_ACCT_NO, 2, 1), substring(a.NEW_FNCL_ACCT_NO, 5, 1), substring(a.NEW_FNCL_ACCT_NO, 6, 1)) = b.fld_mtch_val) OR (b.has_wildcard AND substring(concat_ws('', substring(a.NEW_FNCL_ACCT_NO, 1, 1), substring(a.NEW_FNCL_ACCT_NO, 2, 1), substring(a.NEW_FNCL_ACCT_NO, 5, 1), substring(a.NEW_FNCL_ACCT_NO, 6, 1)), 1, 100) RLIKE b.regex_pattern)",
+                "ORG": "((b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val))",
+                "AC": "((b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val))",
+                "ACCT": "((b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val))",
+                "FAC": "((b.has_wildcard AND a.PCTR_FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_FAC_CD = b.fld_mtch_val))",
+                "BU": "((b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val))",
+                "DEPTNO": "((b.has_wildcard AND a.DEPT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.DEPT_NO = b.fld_mtch_val))"
+            },
+            "war_det_field_conditions": {
+                "ACLVLS": "a.ACCT_LVL LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "ACCT-OWN-FNCL-ORG": "(!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val) OR (b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.NEW_FNCL_ACCT_NO, a.OWN_FNCL_ORG_CD) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.NEW_FNCL_ACCT_NO, a.OWN_FNCL_ORG_CD) RLIKE b.regex_pattern)",
+                "ORG-AC": "(!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern)",
+                "BU-ACCT": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern)",
+                "BU-AC": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.NEW_FNCL_ACCT_NO) RLIKE b.regex_pattern)",
+                "BU-ORG": "(!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val) OR (b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern)",
+                "AC1256": "(!b.has_wildcard AND concat_ws('', substring(a.NEW_FNCL_ACCT_NO, 1, 1), substring(a.NEW_FNCL_ACCT_NO, 2, 1), substring(a.NEW_FNCL_ACCT_NO, 5, 1), substring(a.NEW_FNCL_ACCT_NO, 6, 1)) = b.fld_mtch_val) OR (b.has_wildcard AND substring(concat_ws('', substring(a.NEW_FNCL_ACCT_NO, 1, 1), substring(a.NEW_FNCL_ACCT_NO, 2, 1), substring(a.NEW_FNCL_ACCT_NO, 5, 1), substring(a.NEW_FNCL_ACCT_NO, 6, 1)), 1, 100) RLIKE b.regex_pattern)",
+                "ORG": "((b.has_wildcard AND a.FNCL_ORG_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FNCL_ORG_CD = b.fld_mtch_val))",
+                "AC": "((b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val))",
+                "ACCT": "((b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val))",
+                "FAC": "((b.has_wildcard AND a.PCTR_FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_FAC_CD = b.fld_mtch_val))",
+                "BU": "((b.has_wildcard AND a.FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.FAC_CD = b.fld_mtch_val))",
+                "DEPTNO": "((b.has_wildcard AND a.DEPT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.DEPT_NO = b.fld_mtch_val))",
+                "PROD-FAM": "((b.has_wildcard AND a.EDS_PROD_FAM_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.EDS_PROD_FAM_CD = b.fld_mtch_val))",
+                "SALES-MODEL": "((b.has_wildcard AND a.SLS_MDL_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.SLS_MDL_NO = b.fld_mtch_val))"
+            },
+            "allocation_lvl": "4",
+            "legal_entity_ap_det": "RY",
+			"legal_entity_exp_det": "28,88,CI,CU,DK,DO,EK,FL,JZ,LY,M1,M8,MJ,ML,NJ,NK,O5,O7,O8,OF,OG,OJ,P9,PA,PD,PF,PH,PI,PL,PN,PO,PP,PQ,PS,PT,PU,QA,QP,QQ,QW,QX,RA,RD,RF,RG,RJ,RK,RL,RO,RP,RQ,RR,RU,RV,RW,RY,RZ,SA,SG,SH,SL,SN,SO,SQ,SR,ST,SV,SW,SX,SY,SZ,TB,TC,TE,TF,TH,TJ,TK,TL,TM,TN,TO,TP,TQ,TS,TT,TV,TW,TX,TY,TZ,UL,UN,VI,VK,VL,VM,VN,VO,VS,VT,VU,VV,VW,VX,VY,VZ,WG,XR,YS",
+            "legal_entity_fogap_det": "28,88,CI,CU,DK,DO,EK,FL,JZ,LY,M1,M8,MJ,ML,NJ,NK,O5,O7,O8,OF,OG,OJ,P9,PA,PD,PF,PH,PI,PL,PN,PO,PP,PQ,PS,PT,PU,QA,QP,QQ,QW,QX,RA,RD,RF,RG,RJ,RK,RL,RO,RP,RQ,RR,RU,RV,RW,RY,RZ,SA,SG,SH,SL,SN,SO,SQ,SR,ST,SV,SW,SX,SY,SZ,TB,TC,TE,TF,TH,TJ,TK,TL,TM,TN,TO,TP,TQ,TS,TT,TV,TW,TX,TY,TZ,UL,UN,VI,VK,VL,VM,VN,VO,VS,VT,VU,VV,VW,VX,VY,VZ,WG,XR,YS",
+            "legal_entity_frt_pay_det": "28,88,CI,CU,DK,DO,EK,FL,JZ,LY,M1,M8,MJ,ML,NJ,NK,O5,O7,O8,OF,OG,OJ,P9,PA,PD,PF,PH,PI,PL,PN,PO,PP,PQ,PS,PT,PU,QA,QP,QQ,QW,QX,RA,RD,RF,RG,RJ,RK,RL,RO,RP,RQ,RR,RU,RV,RW,RY,RZ,SA,SG,SH,SL,SN,SO,SQ,SR,ST,SV,SW,SX,SY,SZ,TB,TC,TE,TF,TH,TJ,TK,TL,TM,TN,TO,TP,TQ,TS,TT,TV,TW,TX,TY,TZ,UL,UN,VI,VK,VL,VM,VN,VO,VS,VT,VU,VV,VW,VX,VY,VZ,WG,XR,YS",
+            "legal_entity_inv_det": "28,88,CI,CU,DK,DO,EK,FL,JZ,LY,M1,M8,MJ,ML,NJ,NK,O5,O7,O8,OF,OG,OJ,P9,PA,PD,PF,PH,PI,PL,PN,PO,PP,PQ,PS,PT,PU,QA,QP,QQ,QW,QX,RA,RD,RF,RG,RJ,RK,RL,RO,RP,RQ,RR,RU,RV,RW,RY,RZ,SA,SG,SH,SL,SN,SO,SQ,SR,ST,SV,SW,SX,SY,SZ,TB,TC,TE,TF,TH,TJ,TK,TL,TM,TN,TO,TP,TQ,TS,TT,TV,TW,TX,TY,TZ,UL,UN,VI,VK,VL,VM,VN,VO,VS,VT,VU,VV,VW,VX,VY,VZ,WG,XR,YS",
+            "legal_entity_lbr_det": "28,88,CI,CU,DK,DO,EK,FL,JZ,LY,M1,M8,MJ,ML,NJ,NK,O5,O7,O8,OF,OG,OJ,P9,PA,PD,PF,PH,PI,PL,PN,PO,PP,PQ,PS,PT,PU,QA,QP,QQ,QW,QX,RA,RD,RF,RG,RJ,RK,RL,RO,RP,RQ,RR,RU,RV,RW,RY,RZ,SA,SG,SH,SL,SN,SO,SQ,SR,ST,SV,SW,SX,SY,SZ,TB,TC,TE,TF,TH,TJ,TK,TL,TM,TN,TO,TP,TQ,TS,TT,TV,TW,TX,TY,TZ,UL,UN,VI,VK,VL,VM,VN,VO,VS,VT,VU,VV,VW,VX,VY,VZ,WG,XR,YS",
+            "legal_entity_war_det": "28,88,CI,CU,DK,DO,EK,FL,JZ,LY,M1,M8,MJ,ML,NJ,NK,O5,O7,O8,OF,OG,OJ,P9,PA,PD,PF,PH,PI,PL,PN,PO,PP,PQ,PS,PT,PU,QA,QP,QQ,QW,QX,RA,RD,RF,RG,RJ,RK,RL,RO,RP,RQ,RR,RU,RV,RW,RY,RZ,SA,SG,SH,SL,SN,SO,SQ,SR,ST,SV,SW,SX,SY,SZ,TB,TC,TE,TF,TH,TJ,TK,TL,TM,TN,TO,TP,TQ,TS,TT,TV,TW,TX,TY,TZ,UL,UN,VI,VK,VL,VM,VN,VO,VS,VT,VU,VV,VW,VX,VY,VZ,WG,XR,YS",
+            "legal_entity_scos_det": "28,88,CI,CU,DK,DO,EK,FL,JZ,LY,M1,M8,MJ,ML,NJ,NK,O5,O7,O8,OF,OG,OJ,P9,PA,PD,PF,PH,PI,PL,PN,PO,PP,PQ,PS,PT,PU,QA,QP,QQ,QW,QX,RA,RD,RF,RG,RJ,RK,RL,RO,RP,RQ,RR,RU,RV,RW,RY,RZ,SA,SG,SH,SL,SN,SO,SQ,SR,ST,SV,SW,SX,SY,SZ,TB,TC,TE,TF,TH,TJ,TK,TL,TM,TN,TO,TP,TQ,TS,TT,TV,TW,TX,TY,TZ,UL,UN,VI,VK,VL,VM,VN,VO,VS,VT,VU,VV,VW,VX,VY,VZ,WG,XR,YS",
+            "split_required": {
+                "column_name": "PCTR_LWR_TIER_2"
+            },
+            "fncl_org": "s3://fsd-os-dev-master-tables/test_rules/fncl_org/",
+            "fncl_org_query": "SELECT a.*, b.TO_FAC_CD, b.TO_FNCL_ORG_CD FROM final_allocation a LEFT JOIN fncl_org b ON a.PCTR_LWR_TIER_2 = b.FNCL_ORG_CD",
+            "allocation_query_lt2": "WITH joined_data AS (SELECT a.transaction_id, a.FAC_CD, a.DTA_TYP_CD, a.ACCTG_YR, a.ACCTG_PRD_NO, a.JE_GRP_NO, a.SEQ_NO, a.PCTR_FAC_CD, a.FNCT,a.PCTR_LWR_TIER_2, a.JE_DR_AMT, a.SRC_AMT,a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO, a.RCVBL_INVC_CTL_NO, a.DEPT_NO, a.OWN_FNCL_ORG_CD, a.LAST_UPDT_ACTV_ID, a.UPDT_USER_LOGON_ID,a.SLS_MDL_NO,a.TRAF_REF_NO,a.EDS_PROD_FAM_CD, a.LAST_UPDT_TS, a.SF_CDC_TS,a.PRD_VAR_CD, a.ACCT_LVL, a.SAP_NO, a.is_allocated, b.POP_FLD_VAL, b.ASGN_DIST_PCT, b.ASGN_RULE_ID AS rule_id, b.FLD_NM, b.FLD_MTCH_VAL, b.POP_FLD_PRTY, b.FILE_ID, b.eff_dt FROM unallocated a INNER JOIN rule_fields b ON a.PCTR_FAC_CD = b.CTL_FNCL_ORG_CD and {}), ranked_data AS (SELECT *, RANK() OVER (PARTITION BY transaction_id ORDER BY eff_dt ASC) AS rank FROM joined_data), filtered_data AS (SELECT transaction_id, FAC_CD, DTA_TYP_CD, ACCTG_YR, ACCTG_PRD_NO, JE_GRP_NO, SEQ_NO, FNCL_ORG_CD, NEW_FNCL_ACCT_NO, RCVBL_INVC_CTL_NO, DEPT_NO, OWN_FNCL_ORG_CD, LAST_UPDT_ACTV_ID, UPDT_USER_LOGON_ID, LAST_UPDT_TS, SF_CDC_TS,FNCT,PCTR_FAC_CD,PRD_VAR_CD,SLS_MDL_NO,TRAF_REF_NO,EDS_PROD_FAM_CD, ACCT_LVL, SAP_NO, is_allocated, POP_FLD_VAL, ASGN_DIST_PCT, rule_id, FLD_NM, FLD_MTCH_VAL, POP_FLD_PRTY, FILE_ID, JE_DR_AMT AS SRC_JE_DR_AMT, (ASGN_DIST_PCT * JE_DR_AMT) / 100 AS JE_DR_AMT, (ASGN_DIST_PCT * SRC_AMT) / 100 AS SRC_AMT, POP_FLD_VAL AS  PCTR_LWR_TIER_2 FROM ranked_data WHERE rank = 1 ) SELECT * FROM filtered_data"
+        },
+        "RBU": {
+            "scos_det_field_conditions": {
+                "AC1-10": "(b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val)",
+                "ACLVLS": "a.ACCT_LVL LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "BU-ACLVLS": "concat(a.FAC_CD, a.ACCT_LVL) LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "LT2-ACLVLS": "concat(a.PCTR_LWR_TIER_2, a.ACCT_LVL) LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "FAC-BU": "(b.has_wildcard AND concat(a.PCTR_FAC_CD, a.FAC_CD) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.PCTR_FAC_CD, a.FAC_CD) = b.fld_mtch_val)",
+                "BU-ORG": "(b.has_wildcard AND concat(a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val)",
+                "FAC-LT2": "(b.has_wildcard AND concat(a.PCTR_FAC_CD, a.PCTR_LWR_TIER_2) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.PCTR_FAC_CD, a.PCTR_LWR_TIER_2) = b.fld_mtch_val)",
+                "FAC-BU-LT2": "(b.has_wildcard AND concat(a.PCTR_FAC_CD, a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.PCTR_FAC_CD, a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val)",
+                "LT2": "(b.has_wildcard AND a.PCTR_LWR_TIER_2 RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_LWR_TIER_2 = b.fld_mtch_val)",
+                "FAC": "(b.has_wildcard AND a.PCTR_FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_FAC_CD = b.fld_mtch_val)"
+            },
+            "ap_det_field_conditions": {
+                "AC1-10": "(b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val)",
+                "ACLVLS": "a.ACCT_LVL LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "BU-ACLVLS": "concat(a.FAC_CD, a.ACCT_LVL) LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "LT2-ACLVLS": "concat(a.PCTR_LWR_TIER_2, a.ACCT_LVL) LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "FAC-BU": "(b.has_wildcard AND concat(a.PCTR_FAC_CD, a.FAC_CD) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.PCTR_FAC_CD, a.FAC_CD) = b.fld_mtch_val)",
+                "BU-ORG": "(b.has_wildcard AND concat(a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val)",
+                "FAC-LT2": "(b.has_wildcard AND concat(a.PCTR_FAC_CD, a.PCTR_LWR_TIER_2) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.PCTR_FAC_CD, a.PCTR_LWR_TIER_2) = b.fld_mtch_val)",
+                "FAC-BU-LT2": "(b.has_wildcard AND concat(a.PCTR_FAC_CD, a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern) OR (!b.has_wildcard AND concat(a.PCTR_FAC_CD, a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val)",
+                "LT2": "(b.has_wildcard AND a.PCTR_LWR_TIER_2 RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_LWR_TIER_2 = b.fld_mtch_val)",
+                "FAC": "(b.has_wildcard AND a.PCTR_FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_FAC_CD = b.fld_mtch_val)"
+            },
+            "exp_det_field_conditions": {
+                "AC1-10": "(!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val) OR (b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern)",
+                "ACLVLS": "a.ACCT_LVL LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "BU-ACLVLS": "(!b.has_wildcard AND concat(a.FAC_CD, a.ACCT_LVL) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.ACCT_LVL) RLIKE b.regex_pattern)",
+                "LT2-ACLVLS": "(!b.has_wildcard AND concat(a.PCTR_LWR_TIER_2, a.ACCT_LVL) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.PCTR_LWR_TIER_2, a.ACCT_LVL) RLIKE b.regex_pattern)",
+                "FAC-BU": "(!b.has_wildcard AND (a.PCTR_FAC_CD = b.fld_mtch_val OR concat(a.PCTR_FAC_CD, a.FAC_CD) = b.fld_mtch_val)) OR (b.has_wildcard AND (a.PCTR_FAC_CD RLIKE b.regex_pattern OR concat(a.PCTR_FAC_CD, a.FAC_CD) RLIKE b.regex_pattern))",
+                "BU-ORG": "(!b.has_wildcard AND (a.FAC_CD = b.fld_mtch_val OR concat(a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val)) OR (b.has_wildcard AND (a.FAC_CD RLIKE b.regex_pattern OR concat(a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern))",
+                "FAC-LT2": "(!b.has_wildcard AND (a.PCTR_FAC_CD = b.fld_mtch_val OR concat(a.PCTR_FAC_CD, a.PCTR_LWR_TIER_2) = b.fld_mtch_val)) OR (b.has_wildcard AND (a.PCTR_FAC_CD RLIKE b.regex_pattern OR concat(a.PCTR_FAC_CD, a.PCTR_LWR_TIER_2) RLIKE b.regex_pattern))",
+                "FAC-BU-LT2": "(!b.has_wildcard AND concat(a.PCTR_FAC_CD, a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.PCTR_FAC_CD, a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern)",
+                "LT2": "(b.has_wildcard AND a.PCTR_LWR_TIER_2 RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_LWR_TIER_2 = b.fld_mtch_val)",
+                "FAC": "(b.has_wildcard AND a.PCTR_FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_FAC_CD = b.fld_mtch_val)"
+            },
+            "fogap_det_field_conditions": {
+                "AC1-10": "(!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val) OR (b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern)",
+                "ACLVLS": "a.ACCT_LVL LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "BU-ACLVLS": "(!b.has_wildcard AND concat(a.FAC_CD, a.ACCT_LVL) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.ACCT_LVL) RLIKE b.regex_pattern)",
+                "LT2-ACLVLS": "(!b.has_wildcard AND concat(a.PCTR_LWR_TIER_2, a.ACCT_LVL) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.PCTR_LWR_TIER_2, a.ACCT_LVL) RLIKE b.regex_pattern)",
+                "FAC-BU": "(!b.has_wildcard AND (a.PCTR_FAC_CD = b.fld_mtch_val OR concat(a.PCTR_FAC_CD, a.FAC_CD) = b.fld_mtch_val)) OR (b.has_wildcard AND (a.PCTR_FAC_CD RLIKE b.regex_pattern OR concat(a.PCTR_FAC_CD, a.FAC_CD) RLIKE b.regex_pattern))",
+                "BU-ORG": "(!b.has_wildcard AND (a.FAC_CD = b.fld_mtch_val OR concat(a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val)) OR (b.has_wildcard AND (a.FAC_CD RLIKE b.regex_pattern OR concat(a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern))",
+                "FAC-LT2": "(!b.has_wildcard AND (a.PCTR_FAC_CD = b.fld_mtch_val OR concat(a.PCTR_FAC_CD, a.PCTR_LWR_TIER_2) = b.fld_mtch_val)) OR (b.has_wildcard AND (a.PCTR_FAC_CD RLIKE b.regex_pattern OR concat(a.PCTR_FAC_CD, a.PCTR_LWR_TIER_2) RLIKE b.regex_pattern))",
+                "FAC-BU-LT2": "(!b.has_wildcard AND concat(a.PCTR_FAC_CD, a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.PCTR_FAC_CD, a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern)",
+                "LT2": "(b.has_wildcard AND a.PCTR_LWR_TIER_2 RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_LWR_TIER_2 = b.fld_mtch_val)",
+                "FAC": "(b.has_wildcard AND a.PCTR_FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_FAC_CD = b.fld_mtch_val)"
+            },
+            "frt_pay_det_field_conditions": {
+                "AC1-10": "(!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val) OR (b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern)",
+                "ACLVLS": "a.ACCT_LVL LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "BU-ACLVLS": "(!b.has_wildcard AND concat(a.FAC_CD, a.ACCT_LVL) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.ACCT_LVL) RLIKE b.regex_pattern)",
+                "LT2-ACLVLS": "(!b.has_wildcard AND concat(a.PCTR_LWR_TIER_2, a.ACCT_LVL) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.PCTR_LWR_TIER_2, a.ACCT_LVL) RLIKE b.regex_pattern)",
+                "FAC-BU": "(!b.has_wildcard AND (a.PCTR_FAC_CD = b.fld_mtch_val OR concat(a.PCTR_FAC_CD, a.FAC_CD) = b.fld_mtch_val)) OR (b.has_wildcard AND (a.PCTR_FAC_CD RLIKE b.regex_pattern OR concat(a.PCTR_FAC_CD, a.FAC_CD) RLIKE b.regex_pattern))",
+                "BU-ORG": "(!b.has_wildcard AND (a.FAC_CD = b.fld_mtch_val OR concat(a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val)) OR (b.has_wildcard AND (a.FAC_CD RLIKE b.regex_pattern OR concat(a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern))",
+                "FAC-LT2": "(!b.has_wildcard AND (a.PCTR_FAC_CD = b.fld_mtch_val OR concat(a.PCTR_FAC_CD, a.PCTR_LWR_TIER_2) = b.fld_mtch_val)) OR (b.has_wildcard AND (a.PCTR_FAC_CD RLIKE b.regex_pattern OR concat(a.PCTR_FAC_CD, a.PCTR_LWR_TIER_2) RLIKE b.regex_pattern))",
+                "FAC-BU-LT2": "(!b.has_wildcard AND concat(a.PCTR_FAC_CD, a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.PCTR_FAC_CD, a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern)",
+                "LT2": "(b.has_wildcard AND a.PCTR_LWR_TIER_2 RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_LWR_TIER_2 = b.fld_mtch_val)",
+                "FAC": "(b.has_wildcard AND a.PCTR_FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_FAC_CD = b.fld_mtch_val)"
+            },
+            "inv_det_field_conditions": {
+                "AC1-10": "(!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val) OR (b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern)",
+                "ACLVLS": "a.ACCT_LVL LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "BU-ACLVLS": "(!b.has_wildcard AND concat(a.FAC_CD, a.ACCT_LVL) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.ACCT_LVL) RLIKE b.regex_pattern)",
+                "LT2-ACLVLS": "(!b.has_wildcard AND concat(a.PCTR_LWR_TIER_2, a.ACCT_LVL) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.PCTR_LWR_TIER_2, a.ACCT_LVL) RLIKE b.regex_pattern)",
+                "FAC-BU": "(!b.has_wildcard AND (a.PCTR_FAC_CD = b.fld_mtch_val OR concat(a.PCTR_FAC_CD, a.FAC_CD) = b.fld_mtch_val)) OR (b.has_wildcard AND (a.PCTR_FAC_CD RLIKE b.regex_pattern OR concat(a.PCTR_FAC_CD, a.FAC_CD) RLIKE b.regex_pattern))",
+                "BU-ORG": "(!b.has_wildcard AND (a.FAC_CD = b.fld_mtch_val OR concat(a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val)) OR (b.has_wildcard AND (a.FAC_CD RLIKE b.regex_pattern OR concat(a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern))",
+                "FAC-LT2": "(!b.has_wildcard AND (a.PCTR_FAC_CD = b.fld_mtch_val OR concat(a.PCTR_FAC_CD, a.PCTR_LWR_TIER_2) = b.fld_mtch_val)) OR (b.has_wildcard AND (a.PCTR_FAC_CD RLIKE b.regex_pattern OR concat(a.PCTR_FAC_CD, a.PCTR_LWR_TIER_2) RLIKE b.regex_pattern))",
+                "FAC-BU-LT2": "(!b.has_wildcard AND concat(a.PCTR_FAC_CD, a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.PCTR_FAC_CD, a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern)",
+                "LT2": "(b.has_wildcard AND a.PCTR_LWR_TIER_2 RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_LWR_TIER_2 = b.fld_mtch_val)",
+                "FAC": "(b.has_wildcard AND a.PCTR_FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_FAC_CD = b.fld_mtch_val)"
+            },
+            "lbr_det_field_conditions": {
+                "AC1-10": "(!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val) OR (b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern)",
+                "ACLVLS": "a.ACCT_LVL LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "BU-ACLVLS": "(!b.has_wildcard AND concat(a.FAC_CD, a.ACCT_LVL) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.ACCT_LVL) RLIKE b.regex_pattern)",
+                "LT2-ACLVLS": "(!b.has_wildcard AND concat(a.PCTR_LWR_TIER_2, a.ACCT_LVL) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.PCTR_LWR_TIER_2, a.ACCT_LVL) RLIKE b.regex_pattern)",
+                "FAC-BU": "(!b.has_wildcard AND (a.PCTR_FAC_CD = b.fld_mtch_val OR concat(a.PCTR_FAC_CD, a.FAC_CD) = b.fld_mtch_val)) OR (b.has_wildcard AND (a.PCTR_FAC_CD RLIKE b.regex_pattern OR concat(a.PCTR_FAC_CD, a.FAC_CD) RLIKE b.regex_pattern))",
+                "BU-ORG": "(!b.has_wildcard AND (a.FAC_CD = b.fld_mtch_val OR concat(a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val)) OR (b.has_wildcard AND (a.FAC_CD RLIKE b.regex_pattern OR concat(a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern))",
+                "FAC-LT2": "(!b.has_wildcard AND (a.PCTR_FAC_CD = b.fld_mtch_val OR concat(a.PCTR_FAC_CD, a.PCTR_LWR_TIER_2) = b.fld_mtch_val)) OR (b.has_wildcard AND (a.PCTR_FAC_CD RLIKE b.regex_pattern OR concat(a.PCTR_FAC_CD, a.PCTR_LWR_TIER_2) RLIKE b.regex_pattern))",
+                "FAC-BU-LT2": "(!b.has_wildcard AND concat(a.PCTR_FAC_CD, a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.PCTR_FAC_CD, a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern)",
+                "LT2": "(b.has_wildcard AND a.PCTR_LWR_TIER_2 RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_LWR_TIER_2 = b.fld_mtch_val)",
+                "FAC": "(b.has_wildcard AND a.PCTR_FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_FAC_CD = b.fld_mtch_val)"
+            },
+            "war_det_field_conditions": {
+                "AC1-10": "(!b.has_wildcard AND a.NEW_FNCL_ACCT_NO = b.fld_mtch_val) OR (b.has_wildcard AND a.NEW_FNCL_ACCT_NO RLIKE b.regex_pattern)",
+                "ACLVLS": "a.ACCT_LVL LIKE REPLACE(b.fld_mtch_val, '*', '%')",
+                "BU-ACLVLS": "(!b.has_wildcard AND concat(a.FAC_CD, a.ACCT_LVL) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.FAC_CD, a.ACCT_LVL) RLIKE b.regex_pattern)",
+                "LT2-ACLVLS": "(!b.has_wildcard AND concat(a.PCTR_LWR_TIER_2, a.ACCT_LVL) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.PCTR_LWR_TIER_2, a.ACCT_LVL) RLIKE b.regex_pattern)",
+                "FAC-BU": "(!b.has_wildcard AND (a.PCTR_FAC_CD = b.fld_mtch_val OR concat(a.PCTR_FAC_CD, a.FAC_CD) = b.fld_mtch_val)) OR (b.has_wildcard AND (a.PCTR_FAC_CD RLIKE b.regex_pattern OR concat(a.PCTR_FAC_CD, a.FAC_CD) RLIKE b.regex_pattern))",
+                "BU-ORG": "(!b.has_wildcard AND (a.FAC_CD = b.fld_mtch_val OR concat(a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val)) OR (b.has_wildcard AND (a.FAC_CD RLIKE b.regex_pattern OR concat(a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern))",
+                "FAC-LT2": "(!b.has_wildcard AND (a.PCTR_FAC_CD = b.fld_mtch_val OR concat(a.PCTR_FAC_CD, a.PCTR_LWR_TIER_2) = b.fld_mtch_val)) OR (b.has_wildcard AND (a.PCTR_FAC_CD RLIKE b.regex_pattern OR concat(a.PCTR_FAC_CD, a.PCTR_LWR_TIER_2) RLIKE b.regex_pattern))",
+                "FAC-BU-LT2": "(!b.has_wildcard AND concat(a.PCTR_FAC_CD, a.FAC_CD, a.FNCL_ORG_CD) = b.fld_mtch_val) OR (b.has_wildcard AND concat(a.PCTR_FAC_CD, a.FAC_CD, a.FNCL_ORG_CD) RLIKE b.regex_pattern)",
+                "LT2": "(b.has_wildcard AND a.PCTR_LWR_TIER_2 RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_LWR_TIER_2 = b.fld_mtch_val)",
+                "FAC": "(b.has_wildcard AND a.PCTR_FAC_CD RLIKE b.regex_pattern) OR (!b.has_wildcard AND a.PCTR_FAC_CD = b.fld_mtch_val)"
+            },
+            "legal_entity_scos_det": "TY",
+            "legal_entity_ap_det": "TY",
+			"legal_entity_fogap_det": "TY",
+            "legal_entity_frt_pay_det": "TY",
+            "legal_entity_inv_det": "TY",
+            "legal_entity_lbr_det": "TY",
+			"legal_entity_exp_det": "TY",
+            "legal_entity_war_det": "TY",
+            "allocation_lvl": "5",
+            "selected_columns": "a.transaction_id, a.FAC_CD, a.DTA_TYP_CD, a.ACCTG_YR, a.ACCTG_PRD_NO, a.JE_GRP_NO, a.SEQ_NO, a.PCTR_FAC_CD, a.PCTR_LWR_TIER_2,a.FNCT,a.PRD_VAR_CD, a.JE_DR_AMT, a.SRC_AMT, a.FNCL_ORG_CD, a.NEW_FNCL_ACCT_NO, a.RCVBL_INVC_CTL_NO, a.DEPT_NO,a.SLS_MDL_NO,a.TRAF_REF_NO,a.EDS_PROD_FAM_CD, a.OWN_FNCL_ORG_CD, a.LAST_UPDT_ACTV_ID, a.UPDT_USER_LOGON_ID, a.LAST_UPDT_TS, a.SF_CDC_TS, a.ACCT_LVL, a.SAP_NO, a.is_allocated, b.POP_FLD_VAL, b.ASGN_DIST_PCT, b.ASGN_RULE_ID AS rule_id, b.FLD_NM, b.FLD_MTCH_VAL, b.POP_FLD_PRTY, b.FILE_ID, b.eff_dt",
+            "allocation_query_rbu": "WITH  ranked_data AS (SELECT *, RANK() OVER (PARTITION BY transaction_id ORDER BY eff_dt ASC) AS rank FROM joined_data),filtered_data AS (SELECT transaction_id, FAC_CD, DTA_TYP_CD, ACCTG_YR, ACCTG_PRD_NO, JE_GRP_NO, SEQ_NO, FNCL_ORG_CD,PCTR_LWR_TIER_2, NEW_FNCL_ACCT_NO, RCVBL_INVC_CTL_NO, DEPT_NO,SLS_MDL_NO,TRAF_REF_NO,EDS_PROD_FAM_CD, OWN_FNCL_ORG_CD, LAST_UPDT_ACTV_ID, UPDT_USER_LOGON_ID, LAST_UPDT_TS, SF_CDC_TS,FNCT,PCTR_FAC_CD,PRD_VAR_CD, ACCT_LVL, SAP_NO, is_allocated, POP_FLD_VAL, ASGN_DIST_PCT, rule_id, FLD_NM, FLD_MTCH_VAL, POP_FLD_PRTY, FILE_ID, JE_DR_AMT AS SRC_JE_DR_AMT, (ASGN_DIST_PCT * JE_DR_AMT) / 100 AS JE_DR_AMT, (ASGN_DIST_PCT * SRC_AMT) / 100 AS SRC_AMT, POP_FLD_VAL AS  TO_FAC_CD FROM ranked_data WHERE rank = 1) SELECT * FROM filtered_data"
+        }
+    },
+    "final_allocation_output": "s3://fsd-os-dev-data-allocations/temp_loc/allocation/",
+    "lineage_output": "s3://fsd-os-dev-data-allocations/temp_loc/lineage/"
+}
