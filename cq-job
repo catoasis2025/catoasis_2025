@@ -1,0 +1,305 @@
+import sys
+import json
+import boto3
+from awsglue.utils import getResolvedOptions
+from awsglue.context import GlueContext
+from awsglue.dynamicframe import DynamicFrame
+from pyspark.context import SparkContext
+from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql.functions import col, to_timestamp, concat_ws, lit, expr,input_file_name, regexp_extract,when,broadcast,sha2,round as spark_round, rand, hash,regexp_replace,concat
+from pyspark.sql.window import Window
+from awsglue.job import Job
+import random
+import string
+import re
+from pyspark.sql.types import StringType, StructField, StructType, Row
+from lineage import *
+
+
+# Get resolved options
+args = getResolvedOptions(sys.argv, ['JOB_NAME','config_path','collector_table','legal_entity','transaction_table_loc'])#'transaction_table_loc', 'file_timestamp', 'filter_date'
+config = args['config_path']
+collector_table = args['collector_table']
+legal_entity = args['legal_entity']
+transaction_table_loc = args['transaction_table_loc']
+
+sc = SparkContext()
+glueContext = GlueContext(sc)
+spark = glueContext.spark_session
+job = Job(glueContext)
+job.init(args['JOB_NAME'], args)
+
+# Spark datetime config
+spark.conf.set("spark.sql.legacy.timeParserPolicy", "LEGACY")
+spark.conf.set("spark.sql.parquet.int96RebaseModeInWrite", "LEGACY")
+
+def archive_s3_prefix(s3_uri):
+    s3 = boto3.client('s3')
+
+    # Extract bucket and prefix
+    s3_uri = s3_uri.replace("s3://", "")
+    bucket, prefix = s3_uri.split("/", 1)
+
+    # Define archive path
+    archive_prefix = f"archived/{prefix}"
+
+    # Paginate through source objects
+    paginator = s3.get_paginator('list_objects_v2')
+    pages = paginator.paginate(Bucket=bucket, Prefix=prefix)
+
+    for page in pages:
+        for obj in page.get('Contents', []):
+            key = obj['Key']
+            if key.endswith('/'):
+                continue  # Skip folder markers
+
+            # Create new key under archived
+            new_key = key.replace(prefix, archive_prefix, 1)
+
+            # Copy and delete
+            s3.copy_object(CopySource={'Bucket': bucket, 'Key': key}, Bucket=bucket, Key=new_key)
+            s3.delete_object(Bucket=bucket, Key=key)
+
+            print(f"Moved: s3://{bucket}/{key} → s3://{bucket}/{new_key}")
+
+def read_json_from_s3(s3_url):
+   try:
+       s3 = boto3.client('s3')
+       bucket, key = s3_url.replace("s3://", "").split("/", 1)
+       response = s3.get_object(Bucket=bucket, Key=key)
+       return json.loads(response['Body'].read().decode('utf-8'))
+   except Exception as e:
+       print(f"Error reading JSON from S3: {e}")
+       return None
+
+def union_by(df1,df2):
+    return df1.select(*[col(c) if c in df1.columns else lit(None).alias(c) for c in list(set(df1.columns + df2.columns))]).union(df2.select(*[col(c) if c in df2.columns else lit(None).alias(c) for c in list(set(df1.columns + df2.columns))]))
+       
+#########function to do accnt_lvl mapping and populate sapno and accnt_lvl col#################
+def accnt_lvl_mapping(transaction_table_loc,accnt_lvl_config,collector_table,new_columns):
+    #read transaction and accnt lvl file in df
+    transaction_table = spark.read.parquet(transaction_table_loc.format(collector_table))
+    if new_columns:
+        for col_name in new_columns:
+            transaction_table = transaction_table.withColumn(col_name, lit(None).cast(StringType()))
+    accnt_lvl_df = spark.read.parquet(accnt_lvl_config.get("accnt_lvl_path"))
+    
+    #join with transaction table accnt_lvl_config.get("accnt_lvl_join_condition")
+    transaction_table.createOrReplaceTempView("transaction_table")
+    accnt_lvl_df.createOrReplaceTempView("acct_lvl")
+    return spark.sql(accnt_lvl_config.get("accnt_lvl_query"))
+    
+#function to generate unique transaction id
+def gen_tran_id(spark, df, list_of_columns, column_name):
+   if df is None or not isinstance(df, DataFrame):
+       raise ValueError("Input 'df' must be a valid Spark DataFrame.")
+   if not list_of_columns or not isinstance(list_of_columns, list):
+       raise ValueError("Input 'list_of_columns' must be a non-empty list of column names.")
+   missing_cols = [col_name for col_name in list_of_columns if col_name not in df.columns]
+   if missing_cols:
+       raise ValueError(f"The following columns are missing in the DataFrame: {missing_cols}")
+   return df.withColumn(column_name, sha2(concat_ws("||", *[col(c) for c in list_of_columns]), 256))
+
+def round_columns(df, columns, precision=2):
+    for column in columns:
+        df = df.withColumn(column, spark_round(col(column), precision))
+    return df   
+    
+#########function to do Allocation#################
+def load_rule_fields(config_dict, legal_entity, rule_type,collector_table):
+    rules_table_path = config_dict.get("rules_table")
+    legal_entity_value = config_dict.get("rule_types", {}).get(rule_type, {}).get(f"legal_entity_{collector_table}")
+    
+    legal_entity_list = legal_entity_value.split(",") if isinstance(legal_entity_value, str) else [legal_entity_value]
+    paths = [rules_table_path.format(le.strip(), rule_type) for le in legal_entity_list] if legal_entity_value else [rules_table_path.format(legal_entity, rule_type)]
+    
+    df = spark.read.parquet(*paths)
+    return df.withColumn("CTL_FNCL_ORG_CD", regexp_extract(input_file_name(), ".*/CTL_FNCL_ORG_CD=([^/]+)/.*", 1)) \
+             .withColumn("POP_FLD_NM", regexp_extract(input_file_name(), ".*/POP_FLD_NM=([^/]+)/.*", 1)) \
+             .withColumn("has_wildcard", col("FLD_MTCH_VAL").contains("*")) \
+             .withColumn("escaped_val", regexp_replace(col("FLD_MTCH_VAL"), "\\.", "\\\\.")) \
+             .withColumn("regex_pattern",when(col("has_wildcard"),concat(lit("^"),regexp_replace(col("escaped_val"), "\\*", ".*"))) \
+             .otherwise(col("FLD_MTCH_VAL")))
+             
+
+def get_field_names(rule_fields):
+    return [row["fld_nm"] for row in rule_fields.select("fld_nm").distinct().orderBy("row_num").toLocalIterator()]
+
+
+def is_nonempty(df):
+    return df.limit(1).count() > 0
+
+def filter_split_column(transaction_table, split_col):
+    if not split_col:
+        return transaction_table, None
+    allocated = transaction_table.filter(col(split_col).isNotNull())
+    unallocated = transaction_table.filter(col(split_col).isNull())
+    return unallocated, allocated
+
+def apply_allocation_logic(transaction_table, rule_fields, field_names, config_dict, rule_type, collector_table, final_allocation):
+    config_field_name= list(config_dict.get("rule_types", {}).get(rule_type, {}).get(f"{collector_table}_field_conditions", {}).keys())
+    print(config_field_name)
+    field_name = [item for item in config_field_name if item in field_names]
+    for fld_nm in field_name:
+        unallocated_df = transaction_table.filter(col("is_allocated") == False)
+        if not is_nonempty(unallocated_df):
+            print(f"No data records found for {fld_nm}, skipping processing.")
+            break
+
+        condition = config_dict.get("rule_types", {}).get(rule_type, {}).get(f"{collector_table}_field_conditions", {}).get(fld_nm)
+        if not condition:
+            print(f"Skipping {fld_nm}, no condition found.")
+            continue
+
+        rule_fields_filtered = rule_fields.filter(col("FLD_NM") == fld_nm)
+        if rule_type in ['FNCT','PV']:
+            rule_fields_filtered = rule_fields_filtered.filter(col("FILE_ID")=="ACTUAL")
+        else:
+            rule_fields_filtered = rule_fields_filtered.filter(col("FILE_ID")=="DETAIL")
+        rule_fields_filtered=broadcast(rule_fields_filtered)
+        if rule_type=='RBU':
+            column_str=config_dict.get("rule_types", {}).get(rule_type, {}).get("selected_columns")
+            selected_columns = [col.strip() for col in column_str.split(",") if col.strip()]
+            joined_data = unallocated_df.alias("a").join(rule_fields_filtered.alias("b"),expr(condition),"inner").selectExpr(*selected_columns)
+            joined_data.createOrReplaceTempView("joined_data")
+            query = config_dict.get("rule_types", {}).get(rule_type, {}).get(f"allocation_query_{rule_type.lower()}")
+            
+        else:
+            unallocated_df.createOrReplaceTempView("unallocated")
+            rule_fields_filtered.createOrReplaceTempView("rule_fields")
+            query = config_dict.get("rule_types", {}).get(rule_type, {}).get(f"allocation_query_{rule_type.lower()}").format(condition)
+
+        allocated_df = spark.sql(query)
+        if rule_type=='LT2':
+             allocated_df = allocated_df.dropDuplicates(["transaction_id","PRD_VAR_CD","PCTR_FAC_CD","PCTR_LWR_TIER_2"])
+        
+        if not is_nonempty(allocated_df):
+            print(f"No allocated records found for {fld_nm}, skipping processing.")
+            continue
+
+        keys = allocated_df.select("transaction_id").distinct().withColumn("alloc_flag_tmp", lit(True))
+        transaction_table = transaction_table.alias("m").join(keys.alias("u"), "transaction_id", "left") \
+            .withColumn("is_allocated", when(col("u.alloc_flag_tmp").isNotNull(), True).otherwise(col("m.is_allocated"))) \
+            .drop("alloc_flag_tmp")
+
+        final_allocation = allocated_df if final_allocation is None else union_by(final_allocation, allocated_df)
+
+    return transaction_table, final_allocation
+
+def process_allocation(transaction_table, lineage_df,config_dict, legal_entity, rule_types, collector_table, index, final_allocation=None):
+    if index >= len(rule_types):
+        return final_allocation,lineage_df
+    rule_type = rule_types[index]
+    rule_fields = load_rule_fields(config_dict, legal_entity, rule_type,collector_table)
+    field_names = get_field_names(rule_fields)
+    if not field_names:
+        return process_allocation(transaction_table, lineage_df,config_dict, legal_entity, rule_types, collector_table, index+1, final_allocation=None)
+        
+    print("Field Names:", field_names)
+    if rule_type != "PV":
+        transaction_table = transaction_table.withColumn("is_allocated", lit(False))
+
+    split_col = config_dict.get("rule_types", {}).get(rule_type, {}).get("split_required", {}).get("column_name")
+    transaction_table, allocated_split = filter_split_column(transaction_table, split_col)
+    if not is_nonempty(transaction_table):
+        return transaction_table,lineage_df
+    transaction_table, final_allocation = apply_allocation_logic(
+        transaction_table, rule_fields, field_names, config_dict, rule_type, collector_table, final_allocation
+    )
+    # print(f"final_allocation for {rule_type}::{final_allocation.count()}")
+    allocation_lvl=config_dict.get("rule_types", {}).get(rule_type, {}).get("allocation_lvl")
+    if rule_type == "FNCT":
+        # print(f"Final allocation count: {final_allocation.count()}")
+        final_allocation,lineage_df_stg = add_allocation_id(spark, final_allocation, lineage_df,allocation_lvl,rule_type)
+        lineage_df = union_by(lineage_df,lineage_df_stg)
+        lineage_df.write.mode("overwrite").parquet("s3://fsd-os-dev-data-allocations/temp_loc/temp_lineage_fnct/")#avaoiding lazy
+        lineage_df=spark.read.parquet("s3://fsd-os-dev-data-allocations/temp_loc/temp_lineage_fnct/")#spark taking parallel
+        return process_allocation(transaction_table.filter(col("is_allocated") == False),lineage_df, config_dict, legal_entity, rule_types, collector_table, index + 1, final_allocation)
+
+    elif rule_type == "PV":
+        transaction_table = transaction_table.filter(col("is_allocated") == False) \
+            .withColumn("PRD_VAR_CD", lit("09")) \
+            .withColumn("PV_CORP_POOL", lit("09")) \
+            .withColumn("PV_SUM_POOL", lit("09"))
+
+        if final_allocation:
+            final_allocation,lineage_df_stg = add_allocation_id(spark, final_allocation, lineage_df,allocation_lvl,rule_type)
+            lineage_df = union_by(lineage_df,lineage_df_stg)
+            lineage_df.write.mode("overwrite").parquet("s3://fsd-os-dev-data-allocations/temp_loc/temp_lineage_pv/")
+            lineage_df=spark.read.parquet("s3://fsd-os-dev-data-allocations/temp_loc/temp_lineage_pv/")
+            final_allocation.createOrReplaceTempView("final_allocation")
+
+        burden_pool_df = spark.read.parquet(config_dict.get("rule_types", {}).get(rule_type, {}).get("pv_burden_pool"))
+        burden_pool_df.createOrReplaceTempView("burden_pool")
+
+        burden_result_df = spark.sql(config_dict.get("rule_types", {}).get(rule_type, {}).get("burden_pool_query"))
+        transaction_table = union_by(burden_result_df, transaction_table)
+        transaction_table.write.mode("overwrite").parquet("s3://fsd-os-dev-data-allocations/temp_loc/temp_pv/")#avaoiding lazy
+        transaction_table=spark.read.parquet("s3://fsd-os-dev-data-allocations/temp_loc/temp_pv/")#spark taking parallel
+        return process_allocation(transaction_table,lineage_df, config_dict, legal_entity, rule_types, collector_table, index + 1)
+
+    elif rule_type == "BU":
+        if allocated_split:
+            final_allocation,lineage_df_stg = add_allocation_id(spark, final_allocation, lineage_df,allocation_lvl,rule_type)
+            lineage_df = union_by(lineage_df,lineage_df_stg)
+            lineage_df.write.mode("overwrite").parquet("s3://fsd-os-dev-data-allocations/temp_loc/temp_lineage_bu/")
+            lineage_df=spark.read.parquet("s3://fsd-os-dev-data-allocations/temp_loc/temp_lineage_bu/")
+            final_allocation = union_by(final_allocation, allocated_split)
+            final_allocation.write.mode("overwrite").parquet("s3://fsd-os-dev-data-allocations/temp_loc/temp_bu/")
+            final_allocation=spark.read.parquet("s3://fsd-os-dev-data-allocations/temp_loc/temp_bu/")
+        return process_allocation(final_allocation if final_allocation else transaction_table,lineage_df, config_dict, legal_entity, rule_types, collector_table, index + 1)
+
+    elif rule_type == "LT2":
+        final_allocation,lineage_df_stg = add_allocation_id(spark, final_allocation, lineage_df,allocation_lvl,rule_type)
+        lineage_df = union_by(lineage_df,lineage_df_stg)
+        lineage_df.write.mode("overwrite").parquet("s3://fsd-os-dev-data-allocations/temp_loc/temp_lineage_lt2/")
+        lineage_df=spark.read.parquet("s3://fsd-os-dev-data-allocations/temp_loc/temp_lineage_lt2/")
+        final_allocation = union_by(final_allocation, allocated_split) if allocated_split else final_allocation
+        
+        final_allocation.createOrReplaceTempView("final_allocation")
+
+        fncl_org = spark.read.parquet(config_dict.get("rule_types", {}).get(rule_type, {}).get("fncl_org"))
+        fncl_org.createOrReplaceTempView("fncl_org")
+
+        final_allocation = spark.sql(config_dict.get("rule_types", {}).get(rule_type, {}).get("fncl_org_query"))
+        final_allocation.write.mode("overwrite").parquet("s3://fsd-os-dev-data-allocations/temp_loc/temp_lt2/")
+        final_allocation=spark.read.parquet("s3://fsd-os-dev-data-allocations/temp_loc/temp_lt2/")
+        return process_allocation(final_allocation if final_allocation else transaction_table,lineage_df, config_dict, legal_entity, rule_types, collector_table, index + 1)
+    else:
+        final_allocation,lineage_df_stg = add_allocation_id(spark, final_allocation, lineage_df,allocation_lvl,rule_type)
+        lineage_df = union_by(lineage_df,lineage_df_stg)
+        return union_by(final_allocation,transaction_table.filter(col("is_allocated") == False)),lineage_df
+
+
+config = read_json_from_s3(config)
+primary_columns = config.get("primary_column")
+new_columns = config.get(f"{collector_table}_additional_columns")
+###################################################################
+#####################   ACCNT_LVL    ##############################
+###################################################################
+transaction_table = accnt_lvl_mapping(transaction_table_loc,config.get("rule_types").get("accnt_lvl"),collector_table,new_columns)#this can be a part of ingestion job
+
+#generate tx_id for now
+transaction_table= gen_tran_id(spark, transaction_table, primary_columns, "transaction_id")
+
+
+lineage_df = create_lineage_df(spark)
+###################################################################
+#####################   Allocation    #############################
+###################################################################
+# transaction_table=transaction_table.withColumn("is_allocated", lit(False))
+rule_types= ['FNCT','PV','BU','LT2','RBU']
+transaction_table,lineage_df=process_allocation(transaction_table,lineage_df, config,legal_entity,rule_types,collector_table,index=0)
+print(f"final records::{transaction_table.count()}")
+columns_to_round = config.get("columns_to_round")
+transaction_table = round_columns(transaction_table, columns_to_round)
+lineage_df = round_columns(lineage_df, columns_to_round)
+
+# Select desired columns from config
+selected_columns = config.get("final_columns")
+transaction_table = transaction_table.select(*selected_columns)
+allocation_path = config.get("final_allocation_output")
+lineage_path = config.get("lineage_output") 
+transaction_table.write.mode("overwrite").csv(f"{allocation_path}{collector_table}/{legal_entity}/",header=True)
+lineage_df.write.mode("overwrite").csv(f"{lineage_path}{collector_table}/{legal_entity}/",header=True)
+# archive_s3_prefix(transaction_table_loc)
